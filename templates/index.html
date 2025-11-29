@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Inovo Shop — E-commerce Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Nav -->
+  <header class="border-b border-slate-800 bg-slate-950/90 backdrop-blur sticky top-0 z-20">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+      <div class="flex items-center gap-2">
+        <div class="h-8 w-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-purple-500 flex items-center justify-center text-xs font-bold">
+          IS
+        </div>
+        <div>
+          <p class="text-sm font-semibold">Inovo Shop</p>
+          <p class="text-[11px] text-slate-400">E-commerce • Demo</p>
+        </div>
+      </div>
+      <div class="ml-auto text-xs text-slate-400 flex items-center gap-2">
+        <span>Demo only — no real payments</span>
+        <span class="hidden sm:inline text-[11px] px-2 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300">
+          Safe sandbox
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main layout -->
+  <main class="flex-1 max-w-6xl mx-auto w-full px-4 py-4 flex flex-col lg:flex-row gap-6">
+
+    <!-- Products -->
+    <section class="flex-1 flex flex-col gap-4">
+      <!-- Hero / search -->
+      <div class="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-4 shadow-lg">
+        <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
+          <div class="flex-1">
+            <h1 class="text-2xl md:text-3xl font-bold mb-1">
+              Shop the Inovo collection
+            </h1>
+            <p class="text-sm text-slate-400 mb-3">
+              Simple demo store: add items to cart, fill checkout, place a fake order.
+            </p>
+          </div>
+
+          <div class="w-full md:w-72">
+            <div class="flex items-center gap-2 bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2">
+              <input
+                id="searchInput"
+                type="text"
+                placeholder="Search hoodie, mug, gear..."
+                class="bg-transparent flex-1 text-sm outline-none placeholder:text-slate-500"
+              />
+              <button
+                class="text-xs px-2 py-1 rounded-lg bg-slate-800 border border-slate-600 text-slate-300"
+                onclick="clearSearch()"
+              >
+                Clear
+              </button>
+            </div>
+
+            <div class="flex flex-wrap gap-2 mt-3 text-xs">
+              <button class="filter-pill" data-category="All">All</button>
+              <button class="filter-pill" data-category="Clothing">Clothing</button>
+              <button class="filter-pill" data-category="Accessories">Accessories</button>
+              <button class="filter-pill" data-category="Gear">Gear</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product grid -->
+      <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 shadow-inner flex-1">
+        <div class="flex items-center mb-3">
+          <h2 class="text-sm font-semibold text-slate-200">Products</h2>
+          <span id="productCount" class="ml-2 text-[11px] text-slate-500"></span>
+        </div>
+        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Cart + Checkout -->
+    <aside class="w-full lg:w-80 flex flex-col gap-4">
+
+      <!-- Alerts -->
+      <section id="alertBox" class="hidden">
+        <div id="alertContent" class="rounded-xl px-4 py-3 text-sm border"></div>
+      </section>
+
+      <!-- Cart -->
+      <section class="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col gap-3">
+        <div class="flex items-center">
+          <h2 class="text-sm font-semibold">Your Cart</h2>
+          <span id="cartBadge" class="ml-2 text-[11px] text-slate-500">(0 items)</span>
+          <button
+            class="ml-auto text-[11px] text-slate-400 hover:text-slate-200 underline"
+            onclick="clearCart()"
+          >
+            Clear
+          </button>
+        </div>
+
+        <div id="cartEmpty" class="text-xs text-slate-500 italic">
+          Your cart is empty. Add some products!
+        </div>
+
+        <div id="cartList" class="space-y-2 text-sm max-h-64 overflow-auto hidden">
+          <!-- Filled by JS -->
+        </div>
+
+        <div class="border-t border-slate-800 pt-3 mt-1 text-sm">
+          <div class="flex justify-between items-center mb-1">
+            <span class="text-slate-400">Subtotal</span>
+            <span id="cartSubtotal" class="font-semibold">$0.00</span>
+          </div>
+          <div class="flex justify-between items-center mb-1 text-[11px] text-slate-500">
+            <span>Shipping</span>
+            <span>Free (demo)</span>
+          </div>
+          <div class="flex justify-between items-center mt-1">
+            <span class="text-xs text-slate-400">Total</span>
+            <span id="cartTotal" class="text-lg font-bold text-emerald-400">$0.00</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Checkout -->
+      <section class="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 shadow-lg">
+        <h2 class="text-sm font-semibold mb-2">Checkout</h2>
+        <div class="space-y-2 text-sm">
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Name</label>
+            <input
+              id="customerName"
+              type="text"
+              class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-400"
+              placeholder="Your full name"
+            />
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Email</label>
+            <input
+              id="customerEmail"
+              type="email"
+              class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-400"
+              placeholder="you@example.com"
+            />
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Shipping Address</label>
+            <textarea
+              id="customerAddress"
+              rows="2"
+              class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-400"
+              placeholder="Street, city, postal code, country"
+            ></textarea>
+          </div>
+
+          <button
+            id="checkoutBtn"
+            class="w-full mt-2 px-4 py-2 rounded-lg bg-emerald-500 text-slate-900 font-semibold text-sm hover:bg-emerald-400 transition disabled:opacity-40 disabled:cursor-not-allowed"
+            onclick="checkout()"
+          >
+            Place Demo Order
+          </button>
+
+          <p class="text-[11px] text-slate-500 mt-1">
+            No real payments. This is a safe demo to test ecommerce flow.
+          </p>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    let products = [];
+    let filteredProducts = [];
+    let cart = [];
+
+    function formatPrice(n) {
+      return "$" + n.toFixed(2);
+    }
+
+    function showAlert(message, type = "info") {
+      const box = document.getElementById("alertBox");
+      const content = document.getElementById("alertContent");
+      const base = "text-sm px-4 py-3 border rounded-xl";
+
+      if (type === "error") {
+        content.className = base + " bg-rose-950/70 border-rose-500/60 text-rose-200";
+      } else if (type === "success") {
+        content.className = base + " bg-emerald-950/70 border-emerald-500/60 text-emerald-200";
+      } else {
+        content.className = base + " bg-slate-900 border-slate-600 text-slate-200";
+      }
+
+      content.textContent = message;
+      box.classList.remove("hidden");
+      setTimeout(() => box.classList.add("hidden"), 3500);
+    }
+
+    function renderProducts() {
+      const grid = document.getElementById("productGrid");
+      const countLabel = document.getElementById("productCount");
+      grid.innerHTML = "";
+
+      filteredProducts.forEach(p => {
+        const card = document.createElement("div");
+        card.className =
+          "bg-slate-900/70 border border-slate-800 rounded-xl p-3 flex flex-col gap-2 hover:border-emerald-500/40 hover:shadow-lg transition";
+
+        card.innerHTML = `
+          <div class="flex flex-col gap-2 h-full">
+            <div class="flex-1">
+              <p class="text-sm font-semibold">${p.name}</p>
+              <p class="text-[11px] text-slate-400 mb-1">${p.description}</p>
+              <span class="inline-flex px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 text-[11px]">
+                ${p.category}
+              </span>
+            </div>
+            <div class="flex items-center justify-between mt-2">
+              <p class="text-base font-bold text-emerald-400">${formatPrice(p.price)}</p>
+              <button
+                class="text-xs px-3 py-1 rounded-lg bg-emerald-500 text-slate-950 font-semibold hover:bg-emerald-400"
+                onclick="addToCart(${p.id})"
+              >
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      countLabel.textContent = `(${filteredProducts.length} items)`;
+    }
+
+    function applyFilters() {
+      const searchVal = document.getElementById("searchInput").value.toLowerCase().trim();
+      const activeCategory =
+        document.querySelector(".filter-pill-active")?.dataset.category || "All";
+
+      filteredProducts = products.filter(p => {
+        const matchCategory =
+          activeCategory === "All" ||
+          p.category.toLowerCase() === activeCategory.toLowerCase();
+        const matchSearch =
+          !searchVal ||
+          p.name.toLowerCase().includes(searchVal) ||
+          p.description.toLowerCase().includes(searchVal) ||
+          p.category.toLowerCase().includes(searchVal);
+
+        return matchCategory && matchSearch;
+      });
+
+      renderProducts();
+    }
+
+    function clearSearch() {
+      document.getElementById("searchInput").value = "";
+      applyFilters();
+    }
+
+    function addToCart(id) {
+      const existing = cart.find(i => i.id === id);
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        cart.push({ id, quantity: 1 });
+      }
+      renderCart();
+      showAlert("Added to cart.", "success");
+    }
+
+    function getProduct(id) {
+      return products.find(p => p.id === id);
+    }
+
+    function updateCartQuantity(id, delta) {
+      const item = cart.find(i => i.id === id);
+      if (!item) return;
+      item.quantity += delta;
+      if (item.quantity <= 0) {
+        cart = cart.filter(i => i.id !== id);
+      }
+      renderCart();
+    }
+
+    function clearCart() {
+      cart = [];
+      renderCart();
+    }
+
+    function renderCart() {
+      const list = document.getElementById("cartList");
+      const emptyMsg = document.getElementById("cartEmpty");
+      const badge = document.getElementById("cartBadge");
+      const subtotalEl = document.getElementById("cartSubtotal");
+      const totalEl = document.getElementById("cartTotal");
+
+      list.innerHTML = "";
+
+      if (!cart.length) {
+        emptyMsg.classList.remove("hidden");
+        list.classList.add("hidden");
+        badge.textContent = "(0 items)";
+        subtotalEl.textContent = "$0.00";
+        totalEl.textContent = "$0.00";
+        return;
+      }
+
+      emptyMsg.classList.add("hidden");
+      list.classList.remove("hidden");
+
+      let itemsCount = 0;
+      let subtotal = 0;
+
+      cart.forEach(ci => {
+        const p = getProduct(ci.id);
+        if (!p) return;
+        const lineTotal = p.price * ci.quantity;
+        itemsCount += ci.quantity;
+        subtotal += lineTotal;
+
+        const row = document.createElement("div");
+        row.className =
+          "flex items-center justify-between gap-2 border-b border-slate-800/80 pb-2 last:border-0";
+
+        row.innerHTML = `
+          <div class="flex-1">
+            <p class="text-xs font-semibold">${p.name}</p>
+            <p class="text-[11px] text-slate-500">${formatPrice(p.price)} • ${p.category}</p>
+          </div>
+          <div class="flex items-center gap-2 text-xs">
+            <button
+              class="h-6 w-6 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center"
+              onclick="updateCartQuantity(${ci.id}, -1)"
+            >-</button>
+            <span>${ci.quantity}</span>
+            <button
+              class="h-6 w-6 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center"
+              onclick="updateCartQuantity(${ci.id}, 1)"
+            >+</button>
+          </div>
+          <div class="text-xs font-semibold text-emerald-300">
+            ${formatPrice(lineTotal)}
+          </div>
+        `;
+        list.appendChild(row);
+      });
+
+      badge.textContent = `(${itemsCount} item${itemsCount !== 1 ? "s" : ""})`;
+      subtotalEl.textContent = formatPrice(subtotal);
+      totalEl.textContent = formatPrice(subtotal);
+    }
+
+    async function checkout() {
+      if (!cart.length) {
+        showAlert("Your cart is empty.", "error");
+        return;
+      }
+
+      const name = document.getElementById("customerName").value.trim();
+      const email = document.getElementById("customerEmail").value.trim();
+      const address = document.getElementById("customerAddress").value.trim();
+      const btn = document.getElementById("checkoutBtn");
+
+      if (!name || !email || !address) {
+        showAlert("Please fill name, email and address.", "error");
+        return;
+      }
+
+      btn.disabled = true;
+
+      const payload = {
+        customer: { name, email, address },
+        items: cart.map(c => ({ id: c.id, quantity: c.quantity })),
+      };
+
+      try {
+        const res = await fetch("/api/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          showAlert(data.error || "Checkout failed.", "error");
+        } else {
+          showAlert(
+            `Order ${data.orderId} placed! Total: ${formatPrice(data.total)} (demo)`,
+            "success"
+          );
+          clearCart();
+        }
+      } catch (e) {
+        console.error(e);
+        showAlert("Network error during checkout.", "error");
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function fetchProducts() {
+      const res = await fetch("/api/products");
+      products = await res.json();
+      filteredProducts = [...products];
+      renderProducts();
+    }
+
+    function setupFilters() {
+      const pills = document.querySelectorAll(".filter-pill");
+      pills.forEach(pill => {
+        pill.classList.add(
+          "px-3",
+          "py-1",
+          "rounded-full",
+          "bg-slate-900",
+          "border",
+          "border-slate-700",
+          "text-slate-300",
+          "cursor-pointer",
+          "hover:border-emerald-400",
+          "hover:text-emerald-300"
+        );
+        pill.addEventListener("click", () => {
+          pills.forEach(p => p.classList.remove("filter-pill-active", "bg-emerald-500/20", "border-emerald-400"));
+          pill.classList.add("filter-pill-active", "bg-emerald-500/20", "border-emerald-400");
+          applyFilters();
+        });
+      });
+
+      const allPill = document.querySelector('.filter-pill[data-category="All"]');
+      if (allPill) allPill.click();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchProducts();
+      setupFilters();
+      document.getElementById("searchInput").addEventListener("input", applyFilters);
+      renderCart();
+    });
+  </script>
+</body>
+</html>
